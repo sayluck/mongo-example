@@ -17,7 +17,6 @@ View the database information through the web page after completion.(http://127.
     Find()
     FindWithRelate()   // Associate records of two documents
 ```
-View the database information through the web page after completion.(http://127.0.0.1:8081)
 
 ## TODO
 The function is not perfect now and the following functions will be added.
