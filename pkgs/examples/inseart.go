@@ -28,7 +28,7 @@ func EgInseartOneWithStruct() error {
 // eg 2 inseart one: use bson.M
 func EgInseartOneWithBson() error {
 	mgo := Connect()
-	doc := bson.M{"name": "xiao hong", "id": "999999", "sex": "2"}
+	doc := bson.M{"name": "xiao hong", "id": "999993", "Sex": 2}
 	ret := mgo.InseartOne(doc)
 	if ret.Error != nil {
 		return ret.Error

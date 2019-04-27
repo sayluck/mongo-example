@@ -31,21 +31,21 @@ type mongoDBer interface {
 }
 
 type option struct {
-	dbName     string
-	collection string
+	DBName     string
+	Collection string
 }
 
 type optFunc func(opt *option)
 
 func SetDBName(dbName string) optFunc {
 	return func(opt *option) {
-		opt.dbName = dbName
+		opt.DBName = dbName
 	}
 }
 
 func SetColl(collection string) optFunc {
 	return func(opt *option) {
-		opt.collection = collection
+		opt.Collection = collection
 	}
 }
 
@@ -61,7 +61,7 @@ func GenerateID(id string) (primitive.ObjectID, error) {
 	return oID, nil
 }
 
-func (mongoDB *MongoDB) prepareDB(opts ...optFunc) *MongoDB {
+func (mongoDB *MongoDB) PrepareDB(opts ...optFunc) *MongoDB {
 	opt := mongoDB.Option
 	for _, f := range opts {
 		f(opt)
@@ -74,13 +74,13 @@ func Create(sAddr string, ctxTime uint, dbName, collection string) mongoDBer {
 		serviceAddr: sAddr,
 		ctxTime:     ctxTime,
 		Option: &option{
-			dbName:     dbName,
-			collection: collection,
+			DBName:     dbName,
+			Collection: collection,
 		},
 	}
 }
 func (mongoDB *MongoDB) NewDBClient(opts ...optFunc) *MongoDB {
-	mongoDB.prepareDB(opts...)
+	mongoDB.PrepareDB(opts...)
 	mongoDB.Ctx, _ = context.WithTimeout(context.TODO(), time.Duration(mongoDB.ctxTime)*time.Second)
 	mongoDB.Client, mongoDB.Error = mongo.Connect(mongoDB.Ctx, options.Client().ApplyURI(mongoDB.serviceAddr))
 	return mongoDB
@@ -92,9 +92,9 @@ func (mongoDB *MongoDB) PingTest() *MongoDB {
 }
 
 func (mongoDB *MongoDB) InseartOne(doc interface{}, opts ...optFunc) *MongoDB {
-	mongoDB.prepareDB(opts...)
-	result, err := mongoDB.Client.Database(mongoDB.Option.dbName).
-		Collection(mongoDB.Option.collection).InsertOne(mongoDB.Ctx, doc)
+	mongoDB.PrepareDB(opts...)
+	result, err := mongoDB.Client.Database(mongoDB.Option.DBName).
+		Collection(mongoDB.Option.Collection).InsertOne(mongoDB.Ctx, doc)
 	if err != nil {
 		mongoDB.Error = err
 		return mongoDB
@@ -104,17 +104,17 @@ func (mongoDB *MongoDB) InseartOne(doc interface{}, opts ...optFunc) *MongoDB {
 }
 
 func (mongoDB *MongoDB) FindByID(id primitive.ObjectID, outDecode *interface{}, opts ...optFunc) *MongoDB {
-	mongoDB.prepareDB(opts...)
+	mongoDB.PrepareDB(opts...)
 	doc := bson.M{"_id": id}
-	mongoDB.Error = mongoDB.Client.Database(mongoDB.Option.dbName).
-		Collection(mongoDB.Option.collection).FindOne(mongoDB.Ctx, doc).Decode(&outDecode)
+	mongoDB.Error = mongoDB.Client.Database(mongoDB.Option.DBName).
+		Collection(mongoDB.Option.Collection).FindOne(mongoDB.Ctx, doc).Decode(&outDecode)
 	return mongoDB
 }
 
 func (mongoDB *MongoDB) Find(filter interface{}, outF interface{}, opts ...optFunc) *MongoDB {
-	mongoDB.prepareDB(opts...)
-	cur, err := mongoDB.Client.Database(mongoDB.Option.dbName).
-		Collection(mongoDB.Option.collection).Find(mongoDB.Ctx, filter)
+	mongoDB.PrepareDB(opts...)
+	cur, err := mongoDB.Client.Database(mongoDB.Option.DBName).
+		Collection(mongoDB.Option.Collection).Find(mongoDB.Ctx, filter)
 	mongoDB.Error = err
 	if err != nil {
 		fmt.Println("error:", err)
@@ -136,9 +136,9 @@ func (mongoDB *MongoDB) Find(filter interface{}, outF interface{}, opts ...optFu
 
 // TODO update in next time
 func (mongoDB *MongoDB) QueryWithRelation(sCollname, rCollName, localF, foreignField, as string, opts ...optFunc) *MongoDB {
-	mongoDB.prepareDB(opts...)
-	cur, err := mongoDB.Client.Database(mongoDB.Option.dbName).
-		Collection(mongoDB.Option.collection).Aggregate(mongoDB.Ctx, mongo.Pipeline{
+	mongoDB.PrepareDB(opts...)
+	cur, err := mongoDB.Client.Database(mongoDB.Option.DBName).
+		Collection(mongoDB.Option.Collection).Aggregate(mongoDB.Ctx, mongo.Pipeline{
 		{
 			{
 				"$match",

@@ -42,3 +42,11 @@ func TestEgFind(t *testing.T) {
 
 	t.Logf("info:%+v", u)
 }
+
+func TestEgFindWithCount(t *testing.T) {
+	ret, err := EgFindWithCount()
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("info:%+v", ret)
+}
